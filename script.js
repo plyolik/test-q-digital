@@ -1,26 +1,12 @@
-let arrayTask = []
+let taskArray = []
 
-const task = document.querySelector('.input');
-const submit = document.querySelector('.btn-add-task')
-const content = document.querySelector('.content')
-const btnRemoveAllTask = document.querySelector('.btn-remove-all')
-const btnReadyAllTask = document.querySelector('.btn-ready-all')
-const taskList = document.querySelector('.task-list')
+const taskInput = document.querySelector('.input');
+const addTaskBtn = document.querySelector('.btn-add-task')
+const removeAllTaskBtn = document.querySelector('.btn-remove-all')
+const readyAllTaskBtn = document.querySelector('.btn-ready-all')
+const taskListDiv = document.querySelector('.task-list')
 
-function addArrayTask() {
-    let currentTask = task.value
-    if (task.value !== '') {
-        let obj = {
-            task: currentTask,
-            status: false
-        }
-        arrayTask.push(obj)
-        createTaskList(obj, arrayTask.indexOf(obj))
-    } 
-    saveArrayTask()
-}
-
-function createTaskList(value, index) {
+function addTaskElement(value, index) {
     let status = 'READY';
     let statusColor = 'task-status_unready'
 
@@ -45,16 +31,16 @@ function createTaskList(value, index) {
 
     const div = document.createElement('div')
     div.setAttribute('data-index', `${index}`)
-    taskList.appendChild(div)
+    taskListDiv.appendChild(div)
     div.innerHTML = element
     
     const btnStatus = div.querySelector('.btn-status')
     const btnDelete = div.querySelector('.btn-delete')
 
     btnDelete.onclick = ()=> {
-        taskList.removeChild(div)
-        arrayTask.splice(index, 1)
-        saveArrayTask()
+        taskListDiv.removeChild(div)
+        taskArray.splice(index, 1)
+        saveTasks()
     }
 
     btnStatus.addEventListener('click', ()=> {
@@ -70,55 +56,60 @@ function createTaskList(value, index) {
 
         btnStatus.textContent = status
         div.querySelector('.task-status').className = `task-status ${statusColor}`
-        saveArrayTask()
+        saveTasks()
     })
 }
 
-function clearForm() {
-    task.value = ''    
+function addTask() {
+    let currentTask = taskInput.value
+    if (taskInput.value !== '') {
+        let obj = {
+            task: currentTask,
+            status: false
+        }
+        taskArray.push(obj)
+        addTaskElement(obj, taskArray.indexOf(obj))
+    } 
+    saveTasks()
+    taskInput.value = ''
 }
 
-function startWork() {
-    addArrayTask()
-    clearForm()
-}
+addTaskBtn.addEventListener('click', addTask)
 
-submit.addEventListener('click', startWork)
-
-function removeAllTask() {
-    if (arrayTask.length !== 0) {
-        arrayTask = []
-        taskList.innerHTML = ''
+function removeAllTasks() {
+    if (taskArray.length !== 0) {
+        taskArray = []
+        taskListDiv.innerHTML = ''
         localStorage.clear()
     }
 
 }
 
-btnRemoveAllTask.addEventListener('click', removeAllTask)
+removeAllTaskBtn.addEventListener('click', removeAllTasks)
 
-function readyAllTask() {
-    taskList.innerHTML = ''
-    arrayTask.forEach((element, i) => {
+function readyAllTasks() {
+    taskListDiv.innerHTML = ''
+    taskArray.forEach((element, i) => {
         element.status = true
-        createTaskList(element, i)
+        addTaskElement(element, i)
     })
-    saveArrayTask()
+    saveTasks()
 }
 
-btnReadyAllTask.addEventListener('click', readyAllTask)
+readyAllTaskBtn.addEventListener('click', readyAllTasks)
 
 function onStartUp() {
     let todoString = localStorage.getItem('todo')
     if (!todoString) 
         return
-    arrayTask = JSON.parse(todoString)
-    arrayTask.forEach((element, i) => {
-        createTaskList(element, i)
+    taskArray = JSON.parse(todoString)
+    taskArray.forEach((element, i) => {
+        addTaskElement(element, i)
     });
 }
 
-function saveArrayTask() {
-    let todoString = JSON.stringify(arrayTask)
+function saveTasks() {
+    let todoString = JSON.stringify(taskArray)
     localStorage.setItem('todo', todoString)
 }
 
