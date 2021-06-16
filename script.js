@@ -7,7 +7,6 @@ const btnRemoveAllTask = document.querySelector('.btn-remove-all')
 const btnReadyAllTask = document.querySelector('.btn-ready-all')
 const taskList = document.querySelector('.task-list')
 
-
 function addArrayTask() {
     let currentTask = task.value
     if (task.value !== '') {
@@ -23,17 +22,17 @@ function addArrayTask() {
 
 function createTaskList(value, index) {
     let status = 'READY';
-    let statusColor = 'unready'
+    let statusColor = 'task-status_unready'
 
     if (value.status) {
         status = 'UNREADY'
-        statusColor = 'ready'
+        statusColor = 'task-status_ready'
     }
 
     let element = `
         <div class="task-container">
-            <div>
-                <p>${value.task}</p>
+            <div class="task-content">
+                <p class="task-title">${value.task}</p>
                 <div class="container-btn">
                     <button class="btn btn-status">${status}</botton>
                     <button class="btn btn-delete">DELETE</botton>
@@ -41,7 +40,7 @@ function createTaskList(value, index) {
             </div>
             <div class="task-status ${statusColor}"></div>
         </div>
-        <div class="liner"></div>
+        <div class="divider"></div>
     `
 
     const div = document.createElement('div')
@@ -62,11 +61,11 @@ function createTaskList(value, index) {
         value.status = !value.status
 
         status = 'READY';
-        statusColor = 'unready'
+        statusColor = 'task-status_unready'
 
         if (value.status) {
             status = 'UNREADY'
-            statusColor = 'ready'
+            statusColor = 'task-status_ready'
         }
 
         btnStatus.textContent = status
@@ -124,5 +123,3 @@ function saveArrayTask() {
 }
 
 document.addEventListener('DOMContentLoaded', onStartUp)
-
-
