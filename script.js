@@ -1,24 +1,29 @@
 let taskArray = []
 
+const ready = 'READY'
+const unready = 'UNREADY'
+const taskStatusUnreadyClass = 'task-status_unready'
+const taskStatusReadyClass = 'task-status_ready'
+
 const taskInput = document.querySelector('.input');
 const addTaskBtn = document.querySelector('.btn-add-task')
 const removeAllTaskBtn = document.querySelector('.btn-remove-all')
 const readyAllTaskBtn = document.querySelector('.btn-ready-all')
 const taskListDiv = document.querySelector('.task-list')
 
-function addTaskElement(value, index) {
-    let status = 'READY';
-    let statusColor = 'task-status_unready'
+function addTaskElement(task, index) {
+    let status = ready;
+    let statusColor = taskStatusUnreadyClass
 
-    if (value.status) {
-        status = 'UNREADY'
-        statusColor = 'task-status_ready'
+    if (task.status) {
+        status = unready
+        statusColor = taskStatusReadyClass
     }
 
     let element = `
         <div class="task-container">
             <div class="task-content">
-                <p class="task-title">${value.task}</p>
+                <p class="task-title">${task.task}</p>
                 <div class="container-btn">
                     <button class="btn btn-status">${status}</botton>
                     <button class="btn btn-delete">DELETE</botton>
@@ -34,30 +39,30 @@ function addTaskElement(value, index) {
     taskListDiv.appendChild(div)
     div.innerHTML = element
     
-    const btnStatus = div.querySelector('.btn-status')
-    const btnDelete = div.querySelector('.btn-delete')
+    div.querySelector('.btn-status').addEventListener('click', ()=> changeStatus(div, task))
+    div.querySelector('.btn-delete').addEventListener('click', ()=> removeTask(div, index))
+}
 
-    btnDelete.onclick = ()=> {
-        taskListDiv.removeChild(div)
-        taskArray.splice(index, 1)
-        saveTasks()
+function removeTask(div, index) {
+    taskListDiv.removeChild(div)
+    taskArray.splice(index, 1)
+    saveTasks()
+}
+
+function changeStatus(div, task) {
+    task.status = !task.status
+
+    status = ready;
+    statusColor = 'task-status_unready'
+
+    if (task.status) {
+        status = unready
+        statusColor = 'task-status_ready'
     }
 
-    btnStatus.addEventListener('click', ()=> {
-        value.status = !value.status
-
-        status = 'READY';
-        statusColor = 'task-status_unready'
-
-        if (value.status) {
-            status = 'UNREADY'
-            statusColor = 'task-status_ready'
-        }
-
-        btnStatus.textContent = status
-        div.querySelector('.task-status').className = `task-status ${statusColor}`
-        saveTasks()
-    })
+    div.querySelector('.btn-status').textContent = status
+    div.querySelector('.task-status').className = `task-status ${statusColor}`
+    saveTasks()
 }
 
 function addTask() {
@@ -74,18 +79,13 @@ function addTask() {
     taskInput.value = ''
 }
 
-addTaskBtn.addEventListener('click', addTask)
-
 function removeAllTasks() {
     if (taskArray.length !== 0) {
         taskArray = []
         taskListDiv.innerHTML = ''
         localStorage.clear()
     }
-
 }
-
-removeAllTaskBtn.addEventListener('click', removeAllTasks)
 
 function readyAllTasks() {
     taskListDiv.innerHTML = ''
@@ -96,21 +96,21 @@ function readyAllTasks() {
     saveTasks()
 }
 
-readyAllTaskBtn.addEventListener('click', readyAllTasks)
-
 function onStartUp() {
-    let todoString = localStorage.getItem('todo')
-    if (!todoString) 
-        return
-    taskArray = JSON.parse(todoString)
-    taskArray.forEach((element, i) => {
-        addTaskElement(element, i)
-    });
+    addTaskBtn.addEventListener('click', addTask)
+    removeAllTaskBtn.addEventListener('click', removeAllTasks)
+    readyAllTaskBtn.addEventListener('click', readyAllTasks)
+
+    let taskArrayJson = localStorage.getItem('taskArray')
+    if (!taskArrayJson) return
+
+    taskArray = JSON.parse(taskArrayJson)
+    taskArray.forEach((task, i) => addTaskElement(task, i));
 }
 
 function saveTasks() {
-    let todoString = JSON.stringify(taskArray)
-    localStorage.setItem('todo', todoString)
+    let taskArrayJson = JSON.stringify(taskArray)
+    localStorage.setItem('taskArray', taskArrayJson)
 }
 
 document.addEventListener('DOMContentLoaded', onStartUp)
